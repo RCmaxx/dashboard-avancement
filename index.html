@@ -16,10 +16,12 @@ main { max-width: 720px; margin: 0 auto; }
 h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; line-height: 1.2; }
 .sub { margin: 0 0 28px; font-size: 15px; line-height: 1.45; color: var(--muted); font-weight: 400; }
 .section { margin: 0 0 32px; }
+.row { display: flex; gap: 12px; }
+.col { flex: 1 1 0; min-width: 0; }
 .steps { margin: 0 0 14px; padding-left: calc(var(--d, 0) * 56px); display: flex; flex-direction: column; align-items: center; gap: 8px; font: 700 11px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #7A3D00; }
 .st-t { text-align: center; }
 .st { width: 90px; }
-.st { display: inline-flex; align-items: center; gap: 6px; }
+.st { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 4px 0; font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
 .st em { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #7A3D00; box-sizing: border-box; }
 .st.on em { background: #FF9A3C; }
 .intro { margin: 8px 0 16px; font-size: 15px; line-height: 1.45; color: var(--ink); }
@@ -46,16 +48,29 @@ function pct(n) {
   return +n.pct || 0;
 }
 const xp = (label, p, d) => `<div class="xp" style="--d:${d}"><div class="xp-bar"><i style="width:${p}%"></i><b>${p} %</b></div><span>${esc(label)}</span></div>`;
-const steps = (n, d) => `<div class="steps" style="--d:${d}">${n.steps.map(s => `<span class="st${s.done ? ' on' : ''}"><em></em>${esc(s.title)}</span>`).join('')}</div>`;
+const steps = (n, d) => `<div class="steps" style="--d:${d}">${n.steps.map((s, i) => `<button type="button" class="st${s.done ? ' on' : ''}" data-k="${esc(n.title)}|${i}"><em></em>${esc(s.title)}</button>`).join('')}</div>`;
 function tree(n, d) {
-  const kids = n.steps ? steps(n, d) : (n.items || []).map(c => tree(c, d + 1)).join('');
-  return xp(n.title, pct(n), d) + kids;
+  // Sous-étapes côte à côte : chacune prend 1/n de la largeur du parent.
+  const kids = n.steps ? steps(n, 0) : n.items ? `<div class="row">${n.items.map(c => `<div class="col">${tree(c, 0)}</div>`).join('')}</div>` : '';
+  return xp(n.title, pct(n), 0) + kids;
 }
 fetch('data.json', { cache: 'no-store' })
   .then(r => { if (!r.ok) throw 0; return r.json(); })
   .then(data => {
-    document.getElementById('plan').innerHTML = (data.sections || []).map(s => `<section class="section">${tree(s, 0)}</section>`).join('');
-    if (pct({ items: [{ pct: 0 }, { pct: 100 }] }) !== 50) console.error('avg');
+    // Coches gardées dans ce navigateur (localStorage), par-dessus data.json.
+    const saved = JSON.parse(localStorage.getItem('dash-steps') || '{}');
+    const walk = (n, f) => { f(n); (n.items || []).forEach(c => walk(c, f)); };
+    data.sections.forEach(sec => walk(sec, n => (n.steps || []).forEach((s, i) => { const k = n.title + '|' + i; if (k in saved) s.done = saved[k]; })));
+    const plan = document.getElementById('plan');
+    const render = () => plan.innerHTML = data.sections.map(s => `<section class="section">${tree(s, 0)}</section>`).join('');
+    plan.onclick = e => {
+      const b = e.target.closest('.st'); if (!b) return;
+      const [t, i] = b.dataset.k.split('|');
+      data.sections.forEach(sec => walk(sec, n => { if (n.steps && n.title === t) { n.steps[i].done = !n.steps[i].done; saved[b.dataset.k] = n.steps[i].done; } }));
+      localStorage.setItem('dash-steps', JSON.stringify(saved));
+      render();
+    };
+    render();
   })
   .catch(() => {});
 
