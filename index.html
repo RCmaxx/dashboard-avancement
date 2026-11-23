@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard avancement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+<style>
+:root { --ink: #1B1B1B; --muted: #5C5C5C; --bg: #F6F4F1; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, -apple-system, system-ui, sans-serif; }
+body { padding: 24px 16px 48px; }
+main { max-width: 720px; margin: 0 auto; }
+h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; line-height: 1.2; }
+.sub { margin: 0 0 28px; font-size: 15px; line-height: 1.45; color: var(--muted); font-weight: 400; }
+#live { margin: 0 0 36px; }
+#live[hidden] { display: none; }
+.section { margin: 0 0 32px; }
+.intro { margin: 8px 0 16px; font-size: 15px; line-height: 1.45; color: var(--ink); }
+.xp { margin: 0 0 14px; padding-left: calc(var(--d, 0) * 16px); text-align: center; font: 700 11px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #7A3D00; }
+.xp-bar { position: relative; height: 16px; border-radius: 8px; background: #2B1A0A; border: 2px solid #7A3D00; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.xp i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(#FFC27A, #FF9A3C 55%, #E8821F); transition: width .8s cubic-bezier(.2,.8,.2,1); }
+.xp b { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 10px; font-weight: 700; text-shadow: 0 1px 0 #000; letter-spacing: 0; text-transform: none; }
+.xp span { display: block; margin-top: 4px; line-height: 1.35; text-wrap: pretty; }
+@media (min-width: 1024px) { body { padding: 40px 24px 64px; } h1 { font-size: 32px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dashboard avancement</h1>
+  <p class="sub">Application web de gestion d'interventions techniques pour le milieu hôtelier et de la location touristique</p>
+  <div id="live" class="xp" hidden>
+    <div class="xp-bar"><i></i><b></b></div>
+    <span></span>
+  </div>
+  <div id="plan"></div>
+</main>
+<script>
+const LIVE = [
+  'https://rcmaxx.github.io/labo-test-fonctionnalites/progress.json',
+  'https://raw.githubusercontent.com/RCmaxx/labo-test-fonctionnalites/main/progress.json'
+];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct = n => n.items && n.items.length ? Math.round(n.items.map(pct).reduce((a, b) => a + b, 0) / n.items.length) : (+n.pct || 0);
+const xp = (label, p, d) => `<div class="xp" style="--d:${d}"><div class="xp-bar"><i style="width:${p}%"></i><b>${p} %</b></div><span>${esc(label)}</span></div>`;
+function tree(n, d) {
+  let h = xp(n.title, pct(n), d);
+  if (n.intro) h += `<p class="intro">${esc(n.intro)}</p>`;
+  if (n.items) h += n.items.map(c => tree(c, d + 1)).join('');
+  return h;
+}
+fetch('data.json', { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw 0; return r.json(); })
+  .then(data => {
+    document.getElementById('plan').innerHTML = (data.sections || []).map(s => `<section class="section">${tree(s, 0)}</section>`).join('');
+    if (pct({ items: [{ pct: 0 }, { pct: 100 }] }) !== 50) console.error('avg');
+  })
+  .catch(() => {});
+
+async function tick() {
+  for (const u of LIVE) {
+    try {
+      const r = await fetch(u, { cache: 'no-store' });
+      if (!r.ok) continue;
+      const d = await r.json();
+      if (typeof d.pct !== 'number') continue;
+      const el = document.getElementById('live');
+      el.querySelector('i').style.width = d.pct + '%';
+      el.querySelector('b').textContent = d.pct + ' %';
+      el.querySelector('span').textContent = d.mission || '';
+      el.hidden = false;
+      return;
+    } catch {}
+  }
+}
+tick();
+setInterval(tick, 20000);
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+{
+  "sections": [
+    {
+      "title": "1. Finir une application fonctionnelle",
+      "items": [
+        {
+          "title": "Version mobile",
+          "items": [
+            { "title": "Développer toutes les fonctionnalités nécessaires", "pct": 0 },
+            { "title": "Tester et rendre l'expérience utilisateur possible, agréable, excellente", "pct": 0 },
+            {
+              "title": "Construire un design moderne, sobre, global et finement choisi, puis une identité",
+              "items": [
+                { "title": "Couleurs", "pct": 0 },
+                { "title": "Typographies", "pct": 0 },
+                { "title": "Marges", "pct": 0 },
+                { "title": "Étiquettes", "pct": 0 },
+                { "title": "Boutons", "pct": 0 },
+                { "title": "Hiérarchisation de l'information", "pct": 0 },
+                { "title": "Position des éléments", "pct": 0 },
+                { "title": "Animations", "pct": 0 },
+                { "title": "Cohérence, uniformisation et harmonie globale", "pct": 0 }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Version standard",
+          "items": [
+            { "title": "Développer toutes les fonctionnalités nécessaires", "pct": 0 },
+            { "title": "Tester et rendre l'expérience utilisateur possible, agréable, excellente", "pct": 0 },
+            {
+              "title": "Construire un design moderne, sobre, global et finement choisi, puis une identité",
+              "items": [
+                { "title": "Couleurs", "pct": 0 },
+                { "title": "Typographies", "pct": 0 },
+                { "title": "Marges", "pct": 0 },
+                { "title": "Étiquettes", "pct": 0 },
+                { "title": "Boutons", "pct": 0 },
+                { "title": "Hiérarchisation de l'information", "pct": 0 },
+                { "title": "Position des éléments", "pct": 0 },
+                { "title": "Animations", "pct": 0 },
+                { "title": "Cohérence, uniformisation et harmonie globale", "pct": 0 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "2. Parcours métier",
+      "intro": "L'application est construite pour épouser le parcours métier de ses utilisateurs. Un outil aide à mieux faire son travail.",
+      "items": [
+        {
+          "title": "Étude du parcours métier : technicien, responsable technique, réceptionniste et directeur",
+          "items": [
+            { "title": "Technicien", "pct": 0 },
+            { "title": "Responsable technique", "pct": 0 },
+            { "title": "Réceptionniste", "pct": 0 },
+            { "title": "Directeur", "pct": 0 }
+          ]
+        },
+        { "title": "Conception de fonctionnalités et d'un espace de travail virtuel qui épouse les parcours métiers de chaque type d'utilisateur, s'adapte à ses contraintes, anticipe et répond aux problèmes rencontrés par chacun", "pct": 0 }
+      ]
+    },
+    { "title": "3. Configurer une base de données pour une utilisation large et professionnelle (1000+ utilisateurs simultanés)", "pct": 0 },
+    { "title": "4. Configurer des applications externes pour se décharger d'une partie du fonctionnement technique (gestion des utilisateurs, APIs, autres)", "pct": 0 },
+    { "title": "5. Trouver un nom de projet, acheter un nom de domaine et le configurer pour l'application web", "pct": 0 },
+    { "title": "6. Remplir les conditions requises pour publier l'appli mobile sur le Google Play Store et l'App Store", "pct": 0 },
+    { "title": "7. Tester l'application et résoudre tous les problèmes", "pct": 0 },
+    { "title": "8. Commercialisation", "pct": 0 }
+  ]
+}
