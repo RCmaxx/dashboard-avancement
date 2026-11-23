@@ -11,16 +11,17 @@
 :root { --ink: #1B1B1B; --muted: #5C5C5C; --bg: #F6F4F1; }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, -apple-system, system-ui, sans-serif; }
-body { padding: 24px 32px 48px 16px; }
+body { padding: 24px 16px 48px; }
 main { max-width: 720px; margin: 0 auto; }
 h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; line-height: 1.2; }
 .sub { margin: 0 0 28px; font-size: 15px; line-height: 1.45; color: var(--muted); font-weight: 400; }
 .section { margin: 0 0 32px; }
-summary { list-style: none; pointer-events: none; }
-summary::-webkit-details-marker { display: none; }
-.xp:has(.dot) { position: relative; }
-.dot { position: absolute; right: -26px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: #7A3D00; opacity: .45; cursor: pointer; pointer-events: auto; }
-details[open] > summary .dot { opacity: 1; }
+.steps { margin: 0 0 14px; padding-left: calc(var(--d, 0) * 56px); display: flex; flex-direction: column; align-items: center; gap: 8px; font: 700 11px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #7A3D00; }
+.st-t { text-align: center; }
+.st { width: 90px; }
+.st { display: inline-flex; align-items: center; gap: 6px; }
+.st em { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #7A3D00; box-sizing: border-box; }
+.st.on em { background: #FF9A3C; }
 .intro { margin: 8px 0 16px; font-size: 15px; line-height: 1.45; color: var(--ink); }
 .xp { margin: 0 0 14px; padding-left: calc(var(--d, 0) * 56px); text-align: center; font: 700 11px/1 Inter, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #7A3D00; }
 .xp-bar { position: relative; height: 16px; border-radius: 8px; background: #2B1A0A; border: 2px solid #7A3D00; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
@@ -38,12 +39,17 @@ details[open] > summary .dot { opacity: 1; }
 </main>
 <script>
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const pct = n => n.items && n.items.length ? Math.round(n.items.map(pct).reduce((a, b) => a + b, 0) / n.items.length) : (+n.pct || 0);
-const xp = (label, p, d, dot = '') => `<div class="xp" style="--d:${d}"><div class="xp-bar"><i style="width:${p}%"></i><b>${p} %</b></div><span>${esc(label)}</span>${dot}</div>`;
+// % d'un nœud : étapes cochées, sinon moyenne de ses sous-étapes, sinon pct saisi.
+function pct(n) {
+  if (n.steps) return Math.round(100 * n.steps.filter(s => s.done).length / n.steps.length);
+  if (n.items && n.items.length) return Math.round(n.items.reduce((sum, c) => sum + pct(c), 0) / n.items.length);
+  return +n.pct || 0;
+}
+const xp = (label, p, d) => `<div class="xp" style="--d:${d}"><div class="xp-bar"><i style="width:${p}%"></i><b>${p} %</b></div><span>${esc(label)}</span></div>`;
+const steps = (n, d) => `<div class="steps" style="--d:${d}">${n.steps.map(s => `<span class="st${s.done ? ' on' : ''}"><em></em>${esc(s.title)}</span>`).join('')}</div>`;
 function tree(n, d) {
-  if (!n.items) return xp(n.title, pct(n), d);
-  // détail replié par défaut, le point ouvre/ferme (details natif : clavier et lecteur d'écran inclus)
-  return `<details><summary>${xp(n.title, pct(n), d, '<em class="dot" title="Afficher / masquer les étapes"></em>')}</summary>${n.items.map(c => tree(c, d + 1)).join('')}</details>`;
+  const kids = n.steps ? steps(n, d) : (n.items || []).map(c => tree(c, d + 1)).join('');
+  return xp(n.title, pct(n), d) + kids;
 }
 fetch('data.json', { cache: 'no-store' })
   .then(r => { if (!r.ok) throw 0; return r.json(); })

@@ -1,8 +1,14 @@
 {
   "sections": [
     { "title": "Appli web déployée fonctionnelle", "items": [
-      { "title": "Design UI", "pct": 0 },
-      { "title": "Métier-UX", "pct": 0 }
+      { "title": "Design UI", "steps": [
+        { "title": "Étape 1", "done": false },
+        { "title": "Étape 2", "done": false },
+        { "title": "Étape 3", "done": false },
+        { "title": "Étape 4", "done": false },
+        { "title": "Étape 5", "done": false }
+      ] },
+      { "title": "Parcours Métiers/UX", "pct": 0 }
     ] },
     { "title": "Applis mobile sur Google Store et App Store", "pct": 0 }
   ]
